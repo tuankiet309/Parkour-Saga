@@ -3,13 +3,12 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     private Animator anim;
-    private bool isRun;
     // ======================================================================
     [Header("Move Info")]
     [SerializeField] private float moveSpeed;
     [SerializeField] private float jumpSpeed;
     private Rigidbody2D rb;
-    private bool runBegun;
+    private bool playerUnlock;
     // ======================================================================
     [Header("Collision Info")]
     [SerializeField] private float groundCheckDistance = 0f;
@@ -33,7 +32,7 @@ public class Player : MonoBehaviour
         AnimatorController();
         CheckCollision();
         CheckInput();
-        if (runBegun)
+        if (playerUnlock)
             rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
     }
 
@@ -43,8 +42,9 @@ public class Player : MonoBehaviour
     // ======================================================================OTHER FUNCTION===============================================================
     private void AnimatorController()
     {
-        isRun = rb.velocity.x != 0;
-        anim.SetBool("isRun", isRun);
+        anim.SetBool("isGrounded", isGrounded);
+        anim.SetFloat("xVelocity",rb.velocity.x);
+        anim.SetFloat("yVelocity", rb.velocity.y);
     }
     private void CheckCollision()
     {
@@ -54,7 +54,7 @@ public class Player : MonoBehaviour
     private void CheckInput()
     {
         if (Input.GetButtonDown("Fire2"))
-            runBegun = true;
+            playerUnlock = true;
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
