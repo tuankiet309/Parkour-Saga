@@ -13,6 +13,18 @@ public class LevelGeneration : MonoBehaviour
     void Update()
     {
         GenratePlatform();
+        DestroyPlatform();
+    }
+
+    private void DestroyPlatform()
+    {
+        if (transform.childCount>0)
+        {
+            Transform partToDelete = transform.GetChild(0);
+            if(Vector2.Distance(partToDelete.position, nextPartPosition) > distanceToDelete)
+                Destroy(partToDelete.gameObject);
+
+        }
     }
 
     private void GenratePlatform()
@@ -24,5 +36,6 @@ public class LevelGeneration : MonoBehaviour
             Transform newPart = Instantiate(part, newPosition, transform.rotation, transform);
             nextPartPosition = newPart.Find("EndPoint").position;
         }
+
     }
 }
