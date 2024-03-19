@@ -17,6 +17,10 @@ public class Player : MonoBehaviour
     [SerializeField] private float groundCheckDistance = 0f;
     [SerializeField] private LayerMask whatIsGround;
     private bool isGrounded;
+    [Header("WallCheckInfo")]
+    [SerializeField] private float wallCheckDistance = 0f;
+    [SerializeField]Transform wallCheckPosition;
+    private bool isFacingWall;
 
 
 
@@ -26,6 +30,10 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         jumpSpeed = defaultJumpSpeed;
+        if (transform.GetChild(0) != null)
+        {
+            wallCheckPosition = transform.GetChild(0);
+        }
     }
 
 
@@ -38,6 +46,8 @@ public class Player : MonoBehaviour
         CheckInput();
         if (playerUnlock)
             rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
+        if(isFacingWall)
+            playerUnlock = false;
     }
 
 
@@ -54,6 +64,7 @@ public class Player : MonoBehaviour
     private void CheckCollision()
     {
         isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, whatIsGround);
+        isFacingWall = Physics2D.Raycast(wallCheckPosition.position, Vector2.right, wallCheckDistance, whatIsGround);
     }
 
     private void CheckInput()
@@ -85,5 +96,7 @@ public class Player : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.DrawLine(transform.position, new Vector2(transform.position.x, transform.position.y - groundCheckDistance));
+        Gizmos.DrawLine(wallCheckPosition.position, new Vector2(wallCheckPosition.position.x + wallCheckDistance, wallCheckPosition.position.y ));
     }
+    
 }
