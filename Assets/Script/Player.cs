@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -11,7 +12,12 @@ public class Player : MonoBehaviour
     private float jumpSpeed;
     private Rigidbody2D rb;
     private bool playerUnlock;
-    private bool canDoubleJump; 
+    private bool canDoubleJump;
+    [Header("Slide Info")]
+    [SerializeField] private float slideSpeed;
+    private bool playerSlidding;
+    [SerializeField] private CapsuleCollider2D capsuleCollider;
+    [SerializeField] private BoxCollider2D boxCollider;
     // ======================================================================
     [Header("Collision Info")]
     [SerializeField] private float groundCheckDistance = 0f;
@@ -34,6 +40,8 @@ public class Player : MonoBehaviour
         {
             wallCheckPosition = transform.GetChild(0);
         }
+       capsuleCollider = GetComponent<CapsuleCollider2D>();
+        boxCollider = GetComponent<BoxCollider2D>();
     }
 
 
@@ -44,12 +52,27 @@ public class Player : MonoBehaviour
         AnimatorController();
         CheckCollision();
         CheckInput();
-        if (playerUnlock)
+        if (playerUnlock && !playerSlidding)
             rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
+        if (playerSlidding)
+        {
+            rb.velocity = new Vector2(slideSpeed, rb.velocity.y);
+            StartCoroutine(SlideFunction());
+        }
         if(isFacingWall)
-            playerUnlock = false;
+        {
+            StartCoroutine(StopRunning());
+        }
     }
-
+    IEnumerator StopRunning()
+    {
+        yield return new WaitForSeconds((float)0.5);
+        if(isFacingWall)
+        {
+            playerUnlock = false;
+        }
+    }
+    
 
 
 
@@ -60,6 +83,8 @@ public class Player : MonoBehaviour
         anim.SetFloat("xVelocity",rb.velocity.x);
         anim.SetFloat("yVelocity", rb.velocity.y);
         anim.SetBool("canDoubleJump", canDoubleJump);
+        anim.SetBool("isFacingWall", isFacingWall);
+        anim.SetBool("isSlidding", playerSlidding);
     }
     private void CheckCollision()
     {
@@ -75,6 +100,20 @@ public class Player : MonoBehaviour
         {
             JumpFunction();
         }
+        if(Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            playerSlidding = true;
+        }
+    }
+    IEnumerator SlideFunction()
+    {
+        
+        capsuleCollider.enabled = false;
+        yield return new WaitForSeconds((float)0.7);
+        capsuleCollider.enabled = true;
+        playerSlidding = false;
+        
+        
     }
 
     private void JumpFunction()
@@ -96,7 +135,8 @@ public class Player : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.DrawLine(transform.position, new Vector2(transform.position.x, transform.position.y - groundCheckDistance));
-        Gizmos.DrawLine(wallCheckPosition.position, new Vector2(wallCheckPosition.position.x + wallCheckDistance, wallCheckPosition.position.y ));
+        Gizmos.DrawLine(wallCheckPosition.position, new Vector2(wallCheckPosition.position.x + wallCheckDistance, wallCheckPosition.position.y));
+        
     }
     
 }
