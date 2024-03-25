@@ -29,6 +29,15 @@ public class Player : MonoBehaviour
     private bool isFacingWall;
     private bool isGrounded;
     private bool isUnderCeiling;
+    [HideInInspector] public bool ledgeDetected;
+    [Header("LedgeClimb Info")]
+    [SerializeField] private Vector2 offSet1;
+    [SerializeField] private Vector2 offSet2;
+    private Vector2 climbBeginPosition;
+    private Vector2 climbEndPosition;
+
+    private bool canGrabLedge = true;
+    private bool canClimb;
 
 
     // ======================================================================START===============================================================
@@ -49,7 +58,7 @@ public class Player : MonoBehaviour
         CheckCollision();
         CheckInput();
         CheckForSlide();
-        
+        CheckForLedge();
         if (isGrounded)
         {
             canDoubleJump = true;
@@ -71,6 +80,26 @@ public class Player : MonoBehaviour
             SlideTimerFunction();
         }
     }
+    private void CheckForLedge()
+    {
+        if(ledgeDetected && canGrabLedge)
+        {
+            canGrabLedge = false;
+            Vector2 ledgePosition = GetComponentInChildren<LedgeDetection>().transform.position;
+            climbBeginPosition = ledgePosition + offSet1;
+            climbEndPosition = ledgePosition + offSet2;
+            canClimb = true;
+        }
+        if(canClimb)
+            transform.position = climbBeginPosition;
+    }
+    private void LegdeClimbOver()
+    {
+        canClimb = false;
+        transform.position = climbEndPosition;
+        Invoke("AllowLedgeGrab", 0.1f);
+    }
+    private void AllowLedgeGrab() => canGrabLedge = true;
     private void CheckForSlide()
     {
         slideTimerCounter -= Time.deltaTime;
@@ -136,12 +165,14 @@ public class Player : MonoBehaviour
         anim.SetFloat("yVelocity", rb.velocity.y);
         anim.SetBool("canDoubleJump", canDoubleJump);
         anim.SetBool("isSlide", isSlide);
+        anim.SetBool("canClimb", canClimb);
     }
     private void CheckCollision()
     {
         isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, whatIsGround);
-        isFacingWall = Physics2D.BoxCast(wallCheck.position, wallCheckSize, 0, Vector2.zero, whatIsGround);
+        isFacingWall = Physics2D.BoxCast(wallCheck.position, wallCheckSize, 0, Vector2.zero,0, whatIsGround);
         isUnderCeiling = Physics2D.Raycast(transform.position,Vector2.up, ceilingCheckDistance, whatIsGround);
+        Debug.Log(ledgeDetected);
     }
 
 
