@@ -76,10 +76,6 @@ public class Player : MonoBehaviour
     {
         if (isDead)
             return;
-        if (Input.GetKeyDown(KeyCode.K)&&!isDead)
-        {
-            StartCoroutine(Die());
-        }
         AnimatorController();
         CheckCollision();
 
@@ -98,7 +94,14 @@ public class Player : MonoBehaviour
         SpeedController();
         
     }
-
+    public void Damage()
+    {
+        if (moveSpeed >= maxSpeed)
+        {
+            Knockback();
+        }
+        else StartCoroutine(Die());
+    }
     private IEnumerator Die()
     {
         isDead = true;
@@ -106,6 +109,8 @@ public class Player : MonoBehaviour
         anim.SetBool("isDead", true);
         yield return new WaitForSeconds(.5f);
         rb.velocity = Vector2.zero;
+        yield return new WaitForSeconds(1f);
+        GameManager.Instance.RestartScence();
     }
 
     private IEnumerator Invincibility()
