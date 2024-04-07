@@ -1,27 +1,33 @@
+using System;
+using System.Collections;
+using UnityEditorInternal;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
     private Animator anim;
+    private Rigidbody2D rb;
+    private SpriteRenderer sr;
+    private bool isDead;
+    private bool playerUnlock;
     // ======================================================================
     [Header("KnockBack Info")]
     [SerializeField] private Vector3 knockBackDir;
     private bool isKnock;
-    [Header("Speed Info")]
+    private bool canBeKnock =true;
+    [Header("Move Info")]
     [SerializeField] private float maxSpeed;
     [SerializeField] private float speedMultiplier;
+    [SerializeField] private float moveSpeed;
     [Space]
     [SerializeField] private float milestoneIncreaser;
     private float speedMilestone;
     private float defaultMovespeed;
     private float defaultMilestoneIncreaser;
-    [Header("Move Info")]
-    [SerializeField] private float moveSpeed;
+    [Header("Jump Info")]
     [SerializeField] private float defaultJumpSpeed;
     [SerializeField] private float doubleJumpSpeed;
     private float jumpSpeed;
-    private Rigidbody2D rb;
-    private bool playerUnlock;
     private bool canDoubleJump;
     [Header("Slide Info")]
     [SerializeField] private float slideTimer = 0f;
@@ -56,6 +62,7 @@ public class Player : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        sr= GetComponent<SpriteRenderer>();
         jumpSpeed = defaultJumpSpeed;
         speedMilestone = milestoneIncreaser;
         defaultMilestoneIncreaser = milestoneIncreaser;
@@ -67,8 +74,12 @@ public class Player : MonoBehaviour
     // ======================================================================UPDATE===============================================================
     void Update()
     {
-        Debug.Log(isFacingWall);
-        
+        if (isDead)
+            return;
+        if (Input.GetKeyDown(KeyCode.K)&&!isDead)
+        {
+            StartCoroutine(Die());
+        }
         AnimatorController();
         CheckCollision();
 
@@ -79,18 +90,46 @@ public class Player : MonoBehaviour
             canDoubleJump = true;
         }
 
-        if (playerUnlock && !isFacingWall)
-            MoveFunction();
+        if (playerUnlock && !isFacingWall && !isDead)
+            SetUpMovement();
         CheckInput();
         CheckForSlide();
         CheckForLedge();
         SpeedController();
         
     }
+
+    private IEnumerator Die()
+    {
+        isDead = true;
+        rb.velocity = knockBackDir;
+        anim.SetBool("isDead", true);
+        yield return new WaitForSeconds(.5f);
+        rb.velocity = Vector2.zero;
+    }
+
+    private IEnumerator Invincibility()
+    {
+        Color origin = sr.color;
+        Color darker = new Color(sr.color.r, sr.color.g, sr.color.b,.5f);
+        canBeKnock = false;
+        for(int i=1;i<6;i++)
+        {
+            sr.color = darker;
+            yield return new WaitForSeconds(i/8f);
+            sr.color = origin;
+            yield return new WaitForSeconds(i/8f);
+        }
+        
+        canBeKnock = true;
+    }
     private void Knockback()
     {
+        if (!canBeKnock)
+            return;
         isKnock = true;
         rb.velocity = knockBackDir;
+        StartCoroutine(Invincibility());
     }
     private void CancelKnock() => isKnock = false;
     private void SpeedReset()
@@ -114,10 +153,7 @@ public class Player : MonoBehaviour
     }
     private void CheckInput()
     {
-        if(Input.GetKeyDown(KeyCode.K))
-        {
-            Knockback();
-        }
+        
         if (Input.GetButtonDown("Fire2"))
             playerUnlock = true;
         if (Input.GetButtonDown("Jump"))
@@ -161,11 +197,10 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void MoveFunction()
+    private void SetUpMovement()
     {
         if (isFacingWall)
-        {
-            
+        {  
             SpeedReset();
             return;
         }
@@ -184,7 +219,7 @@ public class Player : MonoBehaviour
 
     private void SlideTimerFunction()
     {
-        if (rb.velocity!= Vector2.zero && slideCooldownTimer < 0 && isGrounded)
+        if (rb.velocity!= Vector2.zero && slideCooldownTimer < 0 && isGrounded )
         {
             isSlide = true;
             slideTimerCounter = slideTimer;
