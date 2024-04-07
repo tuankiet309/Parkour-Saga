@@ -4,6 +4,17 @@ public class Player : MonoBehaviour
 {
     private Animator anim;
     // ======================================================================
+    [Header("KnockBack Info")]
+    [SerializeField] private Vector3 knockBackDir;
+    private bool isKnock;
+    [Header("Speed Info")]
+    [SerializeField] private float maxSpeed;
+    [SerializeField] private float speedMultiplier;
+    [Space]
+    [SerializeField] private float milestoneIncreaser;
+    private float speedMilestone;
+    private float defaultMovespeed;
+    private float defaultMilestoneIncreaser;
     [Header("Move Info")]
     [SerializeField] private float moveSpeed;
     [SerializeField] private float defaultJumpSpeed;
@@ -46,6 +57,9 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         jumpSpeed = defaultJumpSpeed;
+        speedMilestone = milestoneIncreaser;
+        defaultMilestoneIncreaser = milestoneIncreaser;
+        defaultMovespeed = moveSpeed;
     }
 
 
@@ -53,22 +67,57 @@ public class Player : MonoBehaviour
     // ======================================================================UPDATE===============================================================
     void Update()
     {
+        Debug.Log(isFacingWall);
         
         AnimatorController();
         CheckCollision();
-        CheckInput();
-        CheckForSlide();
-        CheckForLedge();
+
+        if (isKnock)
+            return;
         if (isGrounded)
         {
             canDoubleJump = true;
         }
-        
+
         if (playerUnlock && !isFacingWall)
             MoveFunction();
+        CheckInput();
+        CheckForSlide();
+        CheckForLedge();
+        SpeedController();
+        
+    }
+    private void Knockback()
+    {
+        isKnock = true;
+        rb.velocity = knockBackDir;
+    }
+    private void CancelKnock() => isKnock = false;
+    private void SpeedReset()
+    {
+        moveSpeed = defaultMovespeed;
+        milestoneIncreaser = defaultMilestoneIncreaser;
+    }
+    private void SpeedController()
+    {
+        if (moveSpeed == maxSpeed)
+            return;
+        if(transform.position.x > speedMilestone)
+        {
+            speedMilestone = speedMilestone + milestoneIncreaser;
+            moveSpeed *= speedMultiplier;
+            slideSpeed *= speedMultiplier;
+            milestoneIncreaser*=speedMultiplier;
+            if(moveSpeed> maxSpeed)
+                moveSpeed = maxSpeed;
+        }
     }
     private void CheckInput()
     {
+        if(Input.GetKeyDown(KeyCode.K))
+        {
+            Knockback();
+        }
         if (Input.GetButtonDown("Fire2"))
             playerUnlock = true;
         if (Input.GetButtonDown("Jump"))
@@ -84,6 +133,7 @@ public class Player : MonoBehaviour
     {
         if(ledgeDetected && canGrabLedge)
         {
+            rb.gravityScale = 0;
             canGrabLedge = false;
             Vector2 ledgePosition = GetComponentInChildren<LedgeDetection>().transform.position;
             climbBeginPosition = ledgePosition + offSet1;
@@ -97,6 +147,7 @@ public class Player : MonoBehaviour
     {
         canClimb = false;
         transform.position = climbEndPosition;
+        rb.gravityScale = 5;
         Invoke("AllowLedgeGrab", 0.1f);
     }
     private void AllowLedgeGrab() => canGrabLedge = true;
@@ -113,7 +164,11 @@ public class Player : MonoBehaviour
     private void MoveFunction()
     {
         if (isFacingWall)
+        {
+            
+            SpeedReset();
             return;
+        }
         if (isSlide )
         {
             rb.velocity = new Vector2(slideSpeed, rb.velocity.y);
@@ -160,13 +215,19 @@ public class Player : MonoBehaviour
     // ======================================================================OTHER FUNCTION===============================================================
     private void AnimatorController()
     {
+        if(rb.velocity.y<-20)
+        {
+            anim.SetBool("canRoll", true);
+        }
         anim.SetBool("isGrounded", isGrounded);
         anim.SetFloat("xVelocity", rb.velocity.x);
         anim.SetFloat("yVelocity", rb.velocity.y);
         anim.SetBool("canDoubleJump", canDoubleJump);
         anim.SetBool("isSlide", isSlide);
         anim.SetBool("canClimb", canClimb);
+        anim.SetBool("isKnock", isKnock);
     }
+    private void RollFinish() => anim.SetBool("canRoll", false);
     private void CheckCollision()
     {
         isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, whatIsGround);
