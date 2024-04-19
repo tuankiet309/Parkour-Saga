@@ -3971,7 +3971,7 @@ Transform:
   m_GameObject: {fileID: 163594212}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.31, y: 0.14, z: 0}
+  m_LocalPosition: {x: 0.511, y: 0.14, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7061,7 +7061,7 @@ Transform:
   m_GameObject: {fileID: 291182362}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.27, y: 1.0699999, z: 0}
+  m_LocalPosition: {x: 0.47099996, y: 1.0699999, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -16466,6 +16466,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 797844350}
+        m_TargetAssemblyTypeName: UI_main, Assembly-CSharp
+        m_MethodName: PauseGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &613923801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19931,6 +19943,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc613e062c93b184eb614b7a35b7cd89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainMenu: {fileID: 1750859241}
+  lastScoreText: {fileID: 347218452}
+  highscoreText: {fileID: 1659450932}
+  coinsText: {fileID: 1601514322}
 --- !u!1 &803559178
 GameObject:
   m_ObjectHideFlags: 0
@@ -23823,6 +23839,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 797844350}
+        m_TargetAssemblyTypeName: UI_main, Assembly-CSharp
+        m_MethodName: PauseGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &938889868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26221,6 +26249,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1009388090}
+  - component: {fileID: 1009388091}
   m_Layer: 5
   m_Name: InGameUI
   m_TagString: Untagged
@@ -26250,6 +26279,23 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1009388091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1009388089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2416813821f9edc4e9946c9f3bbbb652, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 2107371664}
+  distance: {fileID: 1007169183}
+  coins: {fileID: 339618684}
+  heartFull: {fileID: 1779550123}
+  heartEmpty: {fileID: 571560443}
 --- !u!1 &1009643621
 GameObject:
   m_ObjectHideFlags: 0
@@ -53514,6 +53560,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 2066966302}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: RestartScence
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2063913378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53908,10 +53966,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3145e33343783eb47871123a305ce0d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  coins: 0
   player: {fileID: 2107371664}
   colorEntilePlatform: 0
   platformColor: {r: 1, g: 0.983102, b: 0, a: 1}
+  playerColor: {r: 1, g: 1, b: 1, a: 1}
+  distance: 0
+  coins: 0
 --- !u!4 &2066966303
 Transform:
   m_ObjectHideFlags: 0
@@ -54960,6 +55020,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerUnlock: 0
+  extraLife: 0
   knockBackDir: {x: -12, y: 7, z: 0}
   maxSpeed: 16
   speedMultiplier: 1.1

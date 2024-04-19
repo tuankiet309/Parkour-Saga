@@ -16,14 +16,10 @@ public class Trap : MonoBehaviour
     }
     protected virtual void Start()
     {
-        bool canSpawn = chancesToSpawn >= Random.RandomRange(0, 100);
+        bool canSpawn = chancesToSpawn >= Random.Range(0, 100);
         if(!canSpawn)
         {
             Destroy(gameObject);
-            /*if(gameObject.GetComponentInParent<Transform>() !=null) 
-            {
-                Destroy(gameObject.GetComponentInParent<Transform>().gameObject);
-            }*/
         }
     }
 }

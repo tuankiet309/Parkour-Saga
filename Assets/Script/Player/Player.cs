@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
     private SpriteRenderer sr;
     private bool isDead;
     [HideInInspector]public bool playerUnlock;
+    [HideInInspector] public bool extraLife;
     // ======================================================================
     [Header("KnockBack Info")]
     [SerializeField] private Vector3 knockBackDir;
@@ -33,6 +34,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float slideTimer = 0f;
     [SerializeField] private float slideSpeed;
     [SerializeField] private float slideCooldown = 0f;
+    private float defaultSlideSpeed;
     private float slideCooldownTimer;
     private bool isSlide;
     private float slideTimerCounter = 0f;
@@ -67,6 +69,7 @@ public class Player : MonoBehaviour
         speedMilestone = milestoneIncreaser;
         defaultMilestoneIncreaser = milestoneIncreaser;
         defaultMovespeed = moveSpeed;
+        defaultSlideSpeed = slideSpeed;
     }
 
 
@@ -78,7 +81,7 @@ public class Player : MonoBehaviour
             return;
         AnimatorController();
         CheckCollision();
-
+        extraLife = moveSpeed >= maxSpeed;
         if (isKnock)
             return;
         if (isGrounded)
@@ -97,15 +100,17 @@ public class Player : MonoBehaviour
     }
     public void Damage()
     {
-        if (moveSpeed >= maxSpeed)
+        if (extraLife)
         {
             Knockback();
+            SpeedReset();
         }
         else StartCoroutine(Die());
     }
     private IEnumerator Die()
     {
         isDead = true;
+        canBeKnock = false;
         rb.velocity = knockBackDir;
         anim.SetBool("isDead", true);
         yield return new WaitForSeconds(.5f);
@@ -142,6 +147,7 @@ public class Player : MonoBehaviour
     {
         moveSpeed = defaultMovespeed;
         milestoneIncreaser = defaultMilestoneIncreaser;
+        slideSpeed = defaultSlideSpeed;
     }
     private void SpeedController()
     {
