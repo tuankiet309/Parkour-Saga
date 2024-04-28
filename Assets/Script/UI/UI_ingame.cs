@@ -21,7 +21,7 @@ public class UI_ingame : MonoBehaviour
     // Update is called once per frame
     void UpdateInfo()
     {
-        distance.text = GameManager.Instance.distance.ToString() +" m";
+        distance.text = GameManager.Instance.distance.ToString() +"m";
         coins.text = GameManager.Instance.coins.ToString();
         heartFull.enabled = player.extraLife;
     }

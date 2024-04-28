@@ -109,14 +109,19 @@ public class Player : MonoBehaviour
     }
     private IEnumerator Die()
     {
-        isDead = true;
-        canBeKnock = false;
-        rb.velocity = knockBackDir;
-        anim.SetBool("isDead", true);
-        yield return new WaitForSeconds(.5f);
-        rb.velocity = Vector2.zero;
-        yield return new WaitForSeconds(1f);
-        GameManager.Instance.RestartScence();
+        if (isDead != true)
+        {
+            AudioManager.Instance.PlaySFX(4);
+            isDead = true;
+            canBeKnock = false;
+            rb.velocity = knockBackDir;
+            anim.SetBool("isDead", true);
+            Time.timeScale = 0.6f;
+            yield return new WaitForSeconds(.5f);
+            rb.velocity = Vector2.zero;
+            yield return new WaitForSeconds(1f);
+            GameManager.Instance.GameEnded();
+        }
     }
 
     private IEnumerator Invincibility()
@@ -248,6 +253,7 @@ public class Player : MonoBehaviour
         if (isGrounded)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
+            AudioManager.Instance.PlaySFX(1);
         }
         else if (canDoubleJump == true)
         {
@@ -255,6 +261,8 @@ public class Player : MonoBehaviour
             canDoubleJump = false;
             rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
             jumpSpeed = defaultJumpSpeed;
+            AudioManager.Instance.PlaySFX(2);
+
         }
     }
 

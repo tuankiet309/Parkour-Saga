@@ -10,6 +10,7 @@ public class Coin : MonoBehaviour
         {
             GameManager.Instance.coins++;
             Destroy(gameObject);
+            AudioManager.Instance.PlaySFX(0);
         }    
     }
 }
