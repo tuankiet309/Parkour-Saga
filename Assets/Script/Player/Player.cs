@@ -179,7 +179,7 @@ public class Player : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            SlideTimerFunction();
+            SlideFunction();
         }
     }
     private void CheckForLedge()
@@ -234,7 +234,7 @@ public class Player : MonoBehaviour
 
     
 
-    private void SlideTimerFunction()
+    public void SlideFunction()
     {
         if (rb.velocity!= Vector2.zero && slideCooldownTimer < 0 && isGrounded )
         {
@@ -244,7 +244,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void JumpFunction()
+    public void JumpFunction()
     {
         if(isSlide && isUnderCeiling)
         {
