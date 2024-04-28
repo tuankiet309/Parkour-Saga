@@ -40,6 +40,10 @@ public class UI_main : MonoBehaviour
         AudioManager.Instance.PlaySFX(3);
         coinsText.text = PlayerPrefs.GetInt("Coins").ToString("#,#");
     }
+    public void SwitchSkyBox(int index)
+    {
+        GameManager.Instance.SetupSkybox(index);
+    }
     public void MuteButton()
     {
         gameMuted = !gameMuted;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using TMPro;
 using UnityEditorInternal;
 using UnityEngine;
 
@@ -16,6 +17,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Vector3 knockBackDir;
     private bool isKnock;
     private bool canBeKnock =true;
+
     [Header("Move Info")]
     [SerializeField] private float maxSpeed;
     [SerializeField] private float speedMultiplier;
@@ -25,11 +27,15 @@ public class Player : MonoBehaviour
     private float speedMilestone;
     private float defaultMovespeed;
     private float defaultMilestoneIncreaser;
+
+    private bool readyToLand;
+
     [Header("Jump Info")]
     [SerializeField] private float defaultJumpSpeed;
     [SerializeField] private float doubleJumpSpeed;
     private float jumpSpeed;
     private bool canDoubleJump;
+
     [Header("Slide Info")]
     [SerializeField] private float slideTimer = 0f;
     [SerializeField] private float slideSpeed;
@@ -54,9 +60,12 @@ public class Player : MonoBehaviour
     [SerializeField] private Vector2 offSet2;
     private Vector2 climbBeginPosition;
     private Vector2 climbEndPosition;
-
     private bool canGrabLedge = true;
     private bool canClimb;
+
+    [Header("Particle Effect")]
+    [SerializeField] private ParticleSystem dustFX;
+    [SerializeField] private ParticleSystem bloodFX;
 
 
     // ======================================================================START===============================================================
@@ -91,15 +100,32 @@ public class Player : MonoBehaviour
 
         if (playerUnlock && !isFacingWall && !isDead)
             SetUpMovement();
-
+        CheckForLanding();
         CheckInput();
         CheckForSlide();
         CheckForLedge();
         SpeedController();
-        
+
     }
+
+    private void CheckForLanding()
+    {
+        if (rb.velocity.y < -5 && !isGrounded)
+        {
+            readyToLand = true;
+        }
+        if (readyToLand && isGrounded)
+        {
+            dustFX.Play();
+            readyToLand = false;
+        }
+    }
+
     public void Damage()
     {
+
+        bloodFX.Play();
+        Debug.Log("Blodd");
         if (extraLife)
         {
             Knockback();
@@ -150,6 +176,8 @@ public class Player : MonoBehaviour
     private void CancelKnock() => isKnock = false;
     private void SpeedReset()
     {
+        if (isSlide)
+            return;
         moveSpeed = defaultMovespeed;
         milestoneIncreaser = defaultMilestoneIncreaser;
         slideSpeed = defaultSlideSpeed;
@@ -236,8 +264,11 @@ public class Player : MonoBehaviour
 
     public void SlideFunction()
     {
+        if (isDead)
+            return;
         if (rb.velocity!= Vector2.zero && slideCooldownTimer < 0 && isGrounded )
         {
+            dustFX.Play();
             isSlide = true;
             slideTimerCounter = slideTimer;
             slideCooldownTimer = slideCooldown;
@@ -246,12 +277,14 @@ public class Player : MonoBehaviour
 
     public void JumpFunction()
     {
-        if(isSlide && isUnderCeiling)
+        if((isSlide && isUnderCeiling)||isDead)
         {
             return;
         }
+        RollFinish();
         if (isGrounded)
         {
+            dustFX.Play();
             rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
             AudioManager.Instance.PlaySFX(1);
         }

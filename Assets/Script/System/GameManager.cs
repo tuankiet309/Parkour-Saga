@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance; // A static reference to the GameManager instance
     public UI_main ui;
     public Player player;
+    [Header("Skybox materials")]
+    [SerializeField] private Material[] skyBoxMat;
 
     [Header("Color info")]
     public bool colorEntilePlatform = false;
@@ -31,7 +33,7 @@ public class GameManager : MonoBehaviour
         Instance = this;
         //LoadColor();
         Time.timeScale = 1;
-
+        SetupSkybox(PlayerPrefs.GetInt("SkyboxSetting"));
 
     }
     private void SaveColor(float r, float b, float g)
@@ -48,6 +50,13 @@ public class GameManager : MonoBehaviour
                                 PlayerPrefs.GetFloat("ColorB")
                                  );
         player.GetComponent<SpriteRenderer>().material.color = playerColor;
+    }
+    public void SetupSkybox(int i)
+    {
+        if(i<=1)
+            RenderSettings.skybox = skyBoxMat[i];
+        else
+            RenderSettings.skybox = skyBoxMat[Random.Range(0,skyBoxMat.Length)];
     }
 
     public void RestartScence() 
