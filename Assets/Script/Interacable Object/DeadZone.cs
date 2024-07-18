@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class DeadZone : MonoBehaviour
 {
+    [SerializeField] private float time;
     [SerializeField] private Player player;
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -16,7 +17,7 @@ public class DeadZone : MonoBehaviour
     IEnumerator SlowDying()
     {       
         AudioManager.Instance.PlaySFX(4);
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(time);
         GameManager.Instance.GameEnded();
     }
     private void Update()

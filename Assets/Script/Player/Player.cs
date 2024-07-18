@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using TMPro;
-using UnityEditorInternal;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -69,6 +68,9 @@ public class Player : MonoBehaviour
 
 
     // ======================================================================START===============================================================
+    private void Awake()
+    {
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -158,9 +160,9 @@ public class Player : MonoBehaviour
         for(int i=1;i<6;i++)
         {
             sr.color = darker;
-            yield return new WaitForSeconds(i/8f);
+            yield return new WaitForSeconds(i/7f);
             sr.color = origin;
-            yield return new WaitForSeconds(i/8f);
+            yield return new WaitForSeconds(i/7f);
         }
         
         canBeKnock = true;

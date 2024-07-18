@@ -8,6 +8,9 @@ public class PlatformController : MonoBehaviour
     [SerializeField] private SpriteRenderer headerSr;
     private BoxCollider2D bd;
 
+    private void Awake()
+    {
+    }
     private void Start()
     {
         bd = GetComponent<BoxCollider2D>();

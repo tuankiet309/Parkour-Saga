@@ -54,6 +54,11 @@ public class UI_Shope : MonoBehaviour
             newButton.GetComponent<Button>().onClick.AddListener(() => PurchaseColor(color, price, ColorType.playerColor));
         }
     }
+    private void OnEnable()
+    {
+        platformDisplay.color = GameManager.Instance.platformColor;
+        playerDisplay.color = GameManager.Instance.playerColor;
+    }
     public void PurchaseColor(Color color, int price, ColorType colorType)
     {
         AudioManager.Instance.PlaySFX(3);
@@ -71,11 +76,11 @@ public class UI_Shope : MonoBehaviour
             }
             StartCoroutine(Notify("Purchase Successful !",1));
             coinsText.text = PlayerPrefs.GetInt("Coins").ToString("#,#");
+            GameManager.Instance.SaveInfo();
         }
         else
         {
             StartCoroutine(Notify("Not enough money !", 1));
-
         }
     }
     private bool EnoughMoney(int price)

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,58 +17,60 @@ public class GameManager : MonoBehaviour
     public Color platformColor;
     public Color playerColor = Color.white;
     [Header("Score info")]
-    public float distance= 0;
+    public float distance = 0;
     public int coins = 300;
     public float score = 0;
     void Awake()
     {
-        /*if (Instance == null) // If there is no instance already
-        {
-            DontDestroyOnLoad(gameObject); // Keep the GameObject, this component is attached to, across different scenes
-            Instance = this;
-        }
-        else if (Instance != this) // If there is already an instance and it's not `this` instance
-        {
-            Destroy(gameObject); // Destroy the GameObject, this component is attached to
-        }*/
         Instance = this;
-        //LoadColor();
         Time.timeScale = 1;
         SetupSkybox(PlayerPrefs.GetInt("SkyboxSetting"));
-
+        LoadPlayerColor();
+        LoadPlatformColor();
     }
-    private void SaveColor(float r, float b, float g)
+    private void SavePlayerColor(float r, float b, float g)
     {
         PlayerPrefs.SetFloat("ColorR", r);
         PlayerPrefs.SetFloat("ColorB", b);
         PlayerPrefs.SetFloat("ColorG", g);
-
     }
-    private void LoadColor()
+    public void LoadPlayerColor()
     {
+        if (PlayerPrefs.GetFloat("ColorR") == 0 && PlayerPrefs.GetFloat("ColorG") == 0 && PlayerPrefs.GetFloat("ColorB") == 0)
+            return;
         playerColor = new Color(PlayerPrefs.GetFloat("ColorR"),
                                 PlayerPrefs.GetFloat("ColorG"),
-                                PlayerPrefs.GetFloat("ColorB")
+                                PlayerPrefs.GetFloat("ColorB"), 1
                                  );
         player.GetComponent<SpriteRenderer>().material.color = playerColor;
     }
+    public void LoadPlatformColor()
+    {
+        if (PlayerPrefs.GetFloat("PColorR") == 0 && PlayerPrefs.GetFloat("PColorG") == 0 && PlayerPrefs.GetFloat("PColorB") == 0)
+            return;
+        platformColor = new Color(PlayerPrefs.GetFloat("PColorR"),
+                                PlayerPrefs.GetFloat("PColorG"),
+                                PlayerPrefs.GetFloat("PColorB"), 1
+                                 );
+    }    
     public void SetupSkybox(int i)
     {
-        if(i<=1)
+        if (i <= 1)
             RenderSettings.skybox = skyBoxMat[i];
         else
-            RenderSettings.skybox = skyBoxMat[Random.Range(0,skyBoxMat.Length)];
+            RenderSettings.skybox = skyBoxMat[Random.Range(0, skyBoxMat.Length)];
     }
 
-    public void RestartScence() 
+    public void RestartScence()
     {
         SaveInfo();
         SceneManager.LoadScene(0);
-    } 
+
+    }
     public void UnlockPlayer() => player.playerUnlock = true;
     private void Update()
     {
-        if(player.transform.position.x > distance)
+        if (player.transform.position.x > distance)
         {
             distance = (int)player.transform.position.x;
         }
@@ -82,10 +85,32 @@ public class GameManager : MonoBehaviour
         {
             PlayerPrefs.SetFloat("HighScore", score);
         }
+        float r = player.GetComponent<SpriteRenderer>().color.r;
+        float b = player.GetComponent<SpriteRenderer>().color.b;
+        float g = player.GetComponent<SpriteRenderer>().color.g;
+        float pr = platformColor.r;
+        float pb = platformColor.b; 
+        float pg = platformColor.g;
+        SavePlayerColor(r, b, g);
+        SavePlatformColor(pr, pb, pg);
     }
+
+    private void SavePlatformColor(float pr, float pb, float pg)
+    {
+        PlayerPrefs.SetFloat("PColorR", pr);
+        PlayerPrefs.SetFloat("PColorB", pb);
+        PlayerPrefs.SetFloat("PColorG", pg);
+
+    }
+
     public void GameEnded()
     {
         SaveInfo();
         ui.OpenEndGameUI();
-    } 
+    }
+    public void QuitGame()
+    {
+        SaveInfo();
+        Application.Quit();
+    }
 }
